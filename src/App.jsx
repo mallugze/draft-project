@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import HollowPurpleIntro from './components/HollowPurpleIntro';
 import Navbar from './components/Navbar';
 import Hero from './components/Hero';
-import SkillsPhysics from './components/SkillsPhysics';
+import SkillsTesseract from './components/SkillsTesseract';
 import Projects from './components/Projects';
 import Contact from './components/Contact';
 
@@ -23,7 +23,7 @@ export default function App() {
         {/* Page Sections */}
         <main>
           <Hero />
-          <SkillsPhysics />
+          <SkillsTesseract />
           <Projects />
           <Contact />
         </main>
