@@ -155,37 +155,89 @@ function SkillNode({ name, icon, color, x, y, z }) {
 // Cinematic Gargantua Black Hole Model (matching Interstellar reference image)
 function GargantuaBlackHole() {
   const horizontalDiskRef = useRef();
-  const verticalHaloRef = useRef();
+  const photonRingRef = useRef();
+  const orb1Ref = useRef();
+  const orb2Ref = useRef();
+  const orb3Ref = useRef();
+
+  // Keep track of rapid orbit angles for spinning light particles
+  const angles = useRef([0, Math.PI * 0.67, Math.PI * 1.33]);
   
   useFrame((state, delta) => {
     if (horizontalDiskRef.current) {
       horizontalDiskRef.current.rotation.z += 0.12 * delta; // rotate horizontal disk
     }
-    if (verticalHaloRef.current) {
-      verticalHaloRef.current.rotation.y += 0.05 * delta; // rotate vertical lensing halo
+    if (photonRingRef.current) {
+      photonRingRef.current.rotation.z -= 0.15 * delta; // rotate photon ring slowly
+    }
+
+    // Orbit the bright white lights rapidly around the core edge
+    const speed = 2.4; // Rad/s (rapid spinning)
+    angles.current[0] += speed * delta;
+    angles.current[1] += speed * delta;
+    angles.current[2] += speed * delta;
+
+    const r = 2.55; // Orbit radius just outside the 2.5 core
+    
+    if (orb1Ref.current) {
+      orb1Ref.current.position.x = Math.cos(angles.current[0]) * r;
+      orb1Ref.current.position.y = Math.sin(angles.current[0]) * r;
+    }
+    if (orb2Ref.current) {
+      orb2Ref.current.position.x = Math.cos(angles.current[1]) * r;
+      orb2Ref.current.position.y = Math.sin(angles.current[1]) * r;
+    }
+    if (orb3Ref.current) {
+      orb3Ref.current.position.x = Math.cos(angles.current[2]) * r;
+      orb3Ref.current.position.y = Math.sin(angles.current[2]) * r;
     }
   });
 
   return (
     <group position={[0, 0, -140]}>
-      {/* 1. Event Horizon: Pure Black Sphere (fog=false to ensure start visibility) */}
+      {/* 1. Gravitational Shadow Disk (Absorbs background light/stars behind core) */}
+      <mesh position={[0, 0, -0.2]}>
+        <circleGeometry args={[3.6, 64]} />
+        <meshBasicMaterial
+          color="#000000"
+          transparent
+          opacity={0.88}
+          fog={false}
+        />
+      </mesh>
+
+      {/* 2. Event Horizon: Pure Black Sphere (Singularity Core) */}
       <mesh>
         <sphereGeometry args={[2.5, 64, 64]} />
         <meshBasicMaterial color="#000000" fog={false} />
       </mesh>
 
-      {/* 2. Gravitational Lensing Halo (Vertical Circular Ring wrapping behind core) */}
-      <mesh ref={verticalHaloRef}>
-        <torusGeometry args={[2.9, 0.28, 16, 100]} />
+      {/* 3. White-Hot Photon Ring (Bright inner edge orbiting event horizon) */}
+      <mesh ref={photonRingRef} position={[0, 0, 0.05]}>
+        <torusGeometry args={[2.56, 0.04, 16, 100]} />
         <meshBasicMaterial
-          color="#ffaa44" // Bright glowing golden yellow
+          color="#ffffff"
           transparent
-          opacity={0.9}
+          opacity={0.95}
           fog={false}
         />
       </mesh>
 
-      {/* 3. Accretion Disk (Horizontal flat ring passing through middle, slightly tilted) */}
+      {/* 4. Orbiting White-Hot Light Points (spinning light streaks) */}
+      <mesh ref={orb1Ref} position={[2.55, 0, 0.06]}>
+        <sphereGeometry args={[0.12, 16, 16]} />
+        <meshBasicMaterial color="#ffffff" fog={false} />
+      </mesh>
+      <mesh ref={orb2Ref} position={[-1.27, 2.2, 0.06]}>
+        <sphereGeometry args={[0.12, 16, 16]} />
+        <meshBasicMaterial color="#ffffff" fog={false} />
+      </mesh>
+      <mesh ref={orb3Ref} position={[-1.27, -2.2, 0.06]}>
+        <sphereGeometry args={[0.12, 16, 16]} />
+        <meshBasicMaterial color="#ffffff" fog={false} />
+      </mesh>
+
+      {/* 5. Accretion Disk (Horizontal flat ring passing through middle, slightly tilted) */}
       <mesh ref={horizontalDiskRef} rotation={[Math.PI / 2.15, 0.05, 0]}>
         <torusGeometry args={[3.8, 0.35, 16, 100]} />
         <meshBasicMaterial
@@ -196,7 +248,7 @@ function GargantuaBlackHole() {
         />
       </mesh>
       
-      {/* 4. Outer Dust Ring (Faint outer disk for volume and depth) */}
+      {/* 6. Outer Dust Ring (Faint outer disk for volume and depth) */}
       <mesh rotation={[Math.PI / 2.15, 0.05, 0]}>
         <ringGeometry args={[3.0, 7.5, 64]} />
         <meshBasicMaterial
