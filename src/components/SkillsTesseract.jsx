@@ -88,13 +88,13 @@ function SkillNode({ name, icon, color, x, y, z }) {
 
   return (
     <group>
-      {/* Laser line to side wall */}
+      {/* Laser line to side wall boundary */}
       <Line
         points={[[x, y, z], [wallX, y, z]]}
         color={color}
         lineWidth={0.5}
         transparent
-        opacity={0.12}
+        opacity={0.1}
       />
 
       {/* Unified glassmorphic logo disk and name label */}
@@ -152,74 +152,61 @@ function SkillNode({ name, icon, color, x, y, z }) {
   );
 }
 
-// Gargantua-style 3D Black Hole - Bypasses depth fog to loom in the center from the start
-function BlackHole() {
-  const diskRef = useRef();
+// Cinematic Gargantua Black Hole Model (matching Interstellar reference image)
+function GargantuaBlackHole() {
+  const horizontalDiskRef = useRef();
+  const verticalHaloRef = useRef();
   
   useFrame((state, delta) => {
-    if (diskRef.current) {
-      diskRef.current.rotation.z += 0.22 * delta; // rotate accretion disk
+    if (horizontalDiskRef.current) {
+      horizontalDiskRef.current.rotation.z += 0.12 * delta; // rotate horizontal disk
+    }
+    if (verticalHaloRef.current) {
+      verticalHaloRef.current.rotation.y += 0.05 * delta; // rotate vertical lensing halo
     }
   });
 
   return (
     <group position={[0, 0, -140]}>
-      {/* Event Horizon (Pure Black Sphere - fog=false to remain visible) */}
+      {/* 1. Event Horizon: Pure Black Sphere (fog=false to ensure start visibility) */}
       <mesh>
-        <sphereGeometry args={[2.5, 32, 32]} />
+        <sphereGeometry args={[2.5, 64, 64]} />
         <meshBasicMaterial color="#000000" fog={false} />
       </mesh>
 
-      {/* Accretion Disk (glowing ring - fog=false to remain visible) */}
-      <mesh ref={diskRef} rotation={[Math.PI / 2.3, 0, 0]}>
-        <torusGeometry args={[3.2, 0.38, 8, 64]} />
-        <meshStandardMaterial
-          color="#f97316"
-          emissive="#f97316"
-          emissiveIntensity={2.8}
+      {/* 2. Gravitational Lensing Halo (Vertical Circular Ring wrapping behind core) */}
+      <mesh ref={verticalHaloRef}>
+        <torusGeometry args={[2.9, 0.28, 16, 100]} />
+        <meshBasicMaterial
+          color="#ffaa44" // Bright glowing golden yellow
+          transparent
+          opacity={0.9}
+          fog={false}
+        />
+      </mesh>
+
+      {/* 3. Accretion Disk (Horizontal flat ring passing through middle, slightly tilted) */}
+      <mesh ref={horizontalDiskRef} rotation={[Math.PI / 2.15, 0.05, 0]}>
+        <torusGeometry args={[3.8, 0.35, 16, 100]} />
+        <meshBasicMaterial
+          color="#ff7711" // Deep orange glowing disk
           transparent
           opacity={0.85}
           fog={false}
         />
       </mesh>
       
-      {/* Corona glow (fog=false to remain visible) */}
-      <mesh rotation={[Math.PI / 2.3, 0, 0]}>
-        <ringGeometry args={[2.4, 5.5, 32]} />
+      {/* 4. Outer Dust Ring (Faint outer disk for volume and depth) */}
+      <mesh rotation={[Math.PI / 2.15, 0.05, 0]}>
+        <ringGeometry args={[3.0, 7.5, 64]} />
         <meshBasicMaterial
-          color="#a855f7"
+          color="#ffa347"
           transparent
-          opacity={0.2}
+          opacity={0.18}
           side={THREE.DoubleSide}
           fog={false}
         />
       </mesh>
-    </group>
-  );
-}
-
-// 5D Tesseract Grid tunnel
-function GridTunnel() {
-  const count = 17;
-  return (
-    <group>
-      {Array.from({ length: count }).map((_, i) => {
-        const z = -i * 9;
-        const color = i % 2 === 0 ? '#3b82f6' : '#a855f7';
-        return (
-          <mesh key={i} position={[0, 0, z]}>
-            <boxGeometry args={[10, 8.5, 9]} />
-            <meshStandardMaterial
-              color={color}
-              wireframe
-              emissive={color}
-              emissiveIntensity={1.2}
-              transparent
-              opacity={0.35}
-            />
-          </mesh>
-        );
-      })}
     </group>
   );
 }
@@ -320,11 +307,8 @@ function TesseractScene({ parentContainer }) {
 
   return (
     <group>
-      {/* 5D wireframe tunnel grid */}
-      <GridTunnel />
-
       {/* Gargantua Black Hole Event Horizon & Accretion Disk (visible from start due to fog=false) */}
-      <BlackHole />
+      <GargantuaBlackHole />
 
       {/* Spiral list of 50+ skill badges */}
       {skillNodes.map((node, i) => (
@@ -342,13 +326,13 @@ export default function SkillsTesseract() {
 
   return (
     <section ref={containerRef} id="skills" className="relative h-[300vh] bg-[#0a0a0a] overflow-visible">
-      {/* Sticky layout container */}
+      {/* Sticky container */}
       <div className="sticky top-0 h-screen w-full overflow-hidden">
         {/* Floating section descriptors */}
         <div className="absolute top-24 left-1/2 -translate-x-1/2 z-10 text-center pointer-events-none select-none">
-          <span className="text-xs font-mono tracking-widest text-neonPurple uppercase">// 5D Space</span>
+          <span className="text-xs font-mono tracking-widest text-neonPurple uppercase">// Cosmic Void</span>
           <h2 className="font-display font-extrabold text-3xl sm:text-4xl text-white mt-1">Tech Stack</h2>
-          <p className="text-gray-500 text-xs mt-1">Scroll down to traverse the skills dimension</p>
+          <p className="text-gray-500 text-xs mt-1">Scroll down to approach the singularity core</p>
         </div>
 
         {/* 3D Canvas */}
