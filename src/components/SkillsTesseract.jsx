@@ -114,7 +114,10 @@ function StarParticles() {
 
   useFrame((state, delta) => {
     if (!pointsRef.current) return;
-    const array = pointsRef.current.geometry.attributes.position.array;
+    const geo = pointsRef.current.geometry;
+    if (!geo || !geo.attributes || !geo.attributes.position) return;
+    const array = geo.attributes.position.array;
+    if (!array) return;
 
     for (let i = 0; i < count; i++) {
       const zIdx = i * 3 + 2;
@@ -126,7 +129,7 @@ function StarParticles() {
       }
     }
 
-    pointsRef.current.geometry.attributes.position.needsUpdate = true;
+    geo.attributes.position.needsUpdate = true;
   });
 
   return (
