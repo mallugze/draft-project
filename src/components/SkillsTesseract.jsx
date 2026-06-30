@@ -1,4 +1,4 @@
-import React, { useRef, useMemo, useEffect, useState } from 'react';
+import React, { useRef, useMemo, useEffect, useState, Suspense } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
 import { Text, Line } from '@react-three/drei';
 import { EffectComposer, Bloom } from '@react-three/postprocessing';
@@ -220,7 +220,9 @@ export default function SkillsTesseract() {
           <ambientLight intensity={0.5} />
           <directionalLight position={[0, 10, 5]} intensity={1.0} />
 
-          <TesseractScene parentContainer={containerRef} />
+          <Suspense fallback={null}>
+            <TesseractScene parentContainer={containerRef} />
+          </Suspense>
         </Canvas>
       </div>
     </section>
